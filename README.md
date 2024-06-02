@@ -10,8 +10,6 @@ This repository contains the code and resources for my master thesis, which focu
 - [Usage](#usage)
 - [Versions of the Network](#versions-of-the-network)
 - [Dataset](#dataset)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -152,10 +150,11 @@ Evaluate the trained models using the corresponding evaluation scripts:
 
 ```bash
 python src/evaluation/evaluate_basic.py --config configs/basic_config.yaml
+```
 
 Replace evaluate_basic.py and basic_config.yaml with the appropriate evaluation script and configuration file for other network versions.
 
-Versions of the Network
+## Versions of the Network
 The repository includes the following versions of the network:
 
 Basic Network: The initial simple network architecture.
@@ -164,5 +163,6 @@ Network with Focal Loss Function: Incorporates the focal loss to handle class im
 Network with Weighted Cross Entropy Loss Function: Uses weighted cross entropy to manage class imbalance.
 Network with Oversampling: Applies oversampling techniques to balance the dataset.
 Network with Synthetic Data: Utilizes synthetic data to augment the training set.
-Dataset
+
+## Dataset
 The CityPersons dataset is used for this project. Make sure to download the dataset as outlined in the Usage section.
