@@ -2,10 +2,8 @@ import os
 import json
 from PIL import Image
 import pathlib
-import numpy as np
-import math
 
-DATA_PATH = pathlib.Path("../../data")
+DATA_PATH = pathlib.Path("data")
 
 
 def adjust_bbox_coordinates(bbox, image_width, image_height):
