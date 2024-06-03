@@ -1,0 +1,24 @@
+# Basic Model Configuration
+
+model_name: basic_network
+
+# Input image dimensions
+image_height: 128
+image_width: 128
+
+# Classes
+num_classes: 6
+class_labels: ['ignore', 'pedestrian', 'person group', 'person (other)', 'rider', 'sitting person']
+
+# Training parameters
+num_epochs: 100
+batch_size: 32
+learning_rate: 0.001
+weight_decay: 0.0001
+
+# Dataset paths
+train_dataset_path: data/processed/train
+validation_dataset_path: data/processed/val
+
+# Model save path
+model_save_path: saved_models/basic

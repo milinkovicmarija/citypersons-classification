@@ -18,6 +18,7 @@ The goal of this thesis is to explore and compare various approaches to person c
 ## Repository Structure
 
 The repository is organized as follows:
+
 citypersons-classification/
 ├── configs \
 │   ├── basic_config.yaml \
