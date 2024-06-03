@@ -20,34 +20,34 @@ The goal of this thesis is to explore and compare various approaches to person c
 The repository is organized as follows:
 
 citypersons-classification/
-├── configs
-│   ├── basic_config.yaml
-│   ├── focal_loss_config.yaml
-│   ├── improved_config.yaml
-│   ├── oversampling_config.yaml
-│   ├── synthetic_data_config.yaml
-│   └── wce_config.yaml
-├── data
-│   ├── processed
-│   ├── raw
-│   └── synthetic
-├── src
-│   ├── cityscapesScripts
-│   └── models
-│       ├── init.py
-│       ├── basic_network.py
-│       ├── focal_loss_network.py
-│       ├── improved_network.py
-│       ├── oversampling_network.py
-│       ├── synthetic_data_network.py
-│       └── wce_network.py
-│   ├── init.py
-│   ├── data_preprocessing.py
-│   ├── evaluate_model.py
-├── .gitignore
-├── LICENSE
-├── README.md
-└── requirements.txt
+├── configs \
+│   ├── basic_config.yaml \
+│   ├── focal_loss_config.yaml \
+│   ├── improved_config.yaml \
+│   ├── oversampling_config.yaml \
+│   ├── synthetic_data_config.yaml \
+│   └── wce_config.yaml \
+├── data \
+│   ├── processed \
+│   ├── raw \
+│   └── synthetic \
+├── src \
+│   ├── cityscapesScripts \
+│   └── models \
+│       ├── init.py \
+│       ├── basic_network.py \
+│       ├── focal_loss_network.py \
+│       ├── improved_network.py \
+│       ├── oversampling_network.py \
+│       ├── synthetic_data_network.py \
+│       └── wce_network.py \
+│   ├── init.py \
+│   ├── data_preprocessing.py \
+│   ├── evaluate_model.py \
+├── .gitignore \
+├── LICENSE \
+├── README.md \
+└── requirements.txt \
 
 ## Installation
 
