@@ -86,8 +86,6 @@ To set up the project, follow these steps:
 
 2. **Extract the data**:
     ```bash
-    unzip data/raw/leftImg8bit_trainvaltest.zip -d data/raw/leftImg8bit
-    unzip data/raw/gtBbox_cityPersons_trainval.zip -d data/raw/gtBboxCityPersons
     unzip data/raw/leftImg8bit_trainvaltest.zip -d data/raw
     unzip data/raw/gtBbox_cityPersons_trainval.zip -d data/raw
     ```
@@ -95,7 +93,6 @@ To set up the project, follow these steps:
 3. **Preprocess the data**:
     ```bash
     python3 data_preprocessing.py
-    python3 src/data_preprocessing.py
     ```
 
 ### Training
