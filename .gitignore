@@ -6,4 +6,4 @@ data/
 notebooks/
 venv/
 src/cityscapesScripts/
-saved_models
+saved_models/
