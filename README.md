@@ -19,7 +19,7 @@ The goal of this thesis is to explore and compare various approaches to person c
 
 The repository is organized as follows:
 
-citypersons-classification/
+citypersons-classification/ \
 ├── configs \
 │   ├── basic_config.yaml \
 │   ├── focal_loss_config.yaml \
@@ -59,9 +59,9 @@ To set up the project, follow these steps:
     cd citypersons-classification
     ```
 
-2. **Clone the CityPersonsScripts repository**:
+2. **Clone the CityscapesScripts repository**:
     ```bash
-    git clone https://github.com/mcordts/cityscapesScripts.git src/citypersonsscripts
+    git clone https://github.com/mcordts/cityscapesScripts.git src/cityscapesScripts
     ```
 
 3. **Create and activate a virtual environment**:
