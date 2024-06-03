@@ -5,3 +5,4 @@ __pycache__/
 data/
 notebooks/
 venv/
+src/cityscapesScripts/

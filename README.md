@@ -18,57 +18,36 @@ The goal of this thesis is to explore and compare various approaches to person c
 ## Repository Structure
 
 The repository is organized as follows:
-diplomski_rad
-├── README.md
-├── LICENSE
-├── .gitignore
-├── data
-│ ├── raw
-│ ├── processed
-│ └── synthetic
-├── notebooks
-│ ├── exploration.ipynb
-│ └── visualization.ipynb
-├── src
-│ ├── init.py
-│ ├── data_preprocessing.py
-│ ├── models
-│ │ ├── init.py
-│ │ ├── basic_network.py
-│ │ ├── improved_network.py
-│ │ ├── network_focal_loss.py
-│ │ ├── network_weighted_ce.py
-│ │ ├── network_oversampling.py
-│ │ └── network_synthetic_data.py
-│ ├── training
-│ │ ├── init.py
-│ │ ├── train_basic.py
-│ │ ├── train_improved.py
-│ │ ├── train_focal_loss.py
-│ │ ├── train_weighted_ce.py
-│ │ ├── train_oversampling.py
-│ │ └── train_synthetic.py
-│ └── evaluation
-│ ├── init.py
-│ ├── evaluate_basic.py
-│ ├── evaluate_improved.py
-│ ├── evaluate_focal_loss.py
-│ ├── evaluate_weighted_ce.py
-│ ├── evaluate_oversampling.py
-│ └── evaluate_synthetic.py
-├── configs
-│ ├── basic_config.yaml
-│ ├── improved_config.yaml
-│ ├── focal_loss_config.yaml
-│ ├── weighted_ce_config.yaml
-│ ├── oversampling_config.yaml
-│ └── synthetic_data_config.yaml
-├── requirements.txt
-└── scripts
-├── download_data.sh
-├── preprocess_data.sh
-└── generate_synthetic_data.py
 
+citypersons-classification/
+├── configs
+│   ├── basic_config.yaml
+│   ├── focal_loss_config.yaml
+│   ├── improved_config.yaml
+│   ├── oversampling_config.yaml
+│   ├── synthetic_data_config.yaml
+│   └── wce_config.yaml
+├── data
+│   ├── processed
+│   ├── raw
+│   └── synthetic
+├── src
+│   ├── cityscapesScripts
+│   └── models
+│       ├── init.py
+│       ├── basic_network.py
+│       ├── focal_loss_network.py
+│       ├── improved_network.py
+│       ├── oversampling_network.py
+│       ├── synthetic_data_network.py
+│       └── wce_network.py
+│   ├── init.py
+│   ├── data_preprocessing.py
+│   ├── evaluate_model.py
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt
 
 ## Installation
 
@@ -76,17 +55,22 @@ To set up the project, follow these steps:
 
 1. **Clone the repository**:
     ```bash
-    git clone <repository_url>
-    cd diplomski_rad
+    git clone https://github.com/milinkovicmarija/citypersons-classification.git
+    cd citypersons-classification
     ```
 
-2. **Create and activate a virtual environment**:
+2. **Clone the CityPersonsScripts repository**:
+    ```bash
+    git clone https://github.com/mcordts/cityscapesScripts.git src/citypersonsscripts
+    ```
+
+3. **Create and activate a virtual environment**:
     ```bash
     python3 -m venv venv
     source venv/bin/activate
     ```
 
-3. **Install the required dependencies**:
+4. **Install the required dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
@@ -97,17 +81,18 @@ To set up the project, follow these steps:
 
 1. **Download the dataset**:
     ```bash
-    ./scripts/download_data.sh
+    python src/cityscapesScripts/cityscapesscripts/download/downloader.py --d data/raw leftImg8bit_trainvaltest.zip   gtBbox_cityPersons_trainval.zip
     ```
 
-2. **Preprocess the data**:
+2. **Extract the data**:
     ```bash
-    ./scripts/preprocess_data.sh
+    unzip data/raw/leftImg8bit_trainvaltest.zip
+    unzip data/raw/gtBbox_cityPersons_trainval.zip
     ```
 
-3. **Generate synthetic data** (if needed):
+3. **Preprocess the data**:
     ```bash
-    python scripts/generate_synthetic_data.py
+    ./src/preprocess_data.sh
     ```
 
 ### Training
@@ -116,32 +101,32 @@ Train the desired version of the network:
 
 - Basic Network:
     ```bash
-    python src/training/train_basic.py --config configs/basic_config.yaml
+    python src/models/basic_network.py --config configs/basic_config.yaml
     ```
 
 - Improved Network:
     ```bash
-    python src/training/train_improved.py --config configs/improved_config.yaml
+    python src/models/improved_network.py --config configs/improved_config.yaml
     ```
 
 - Network with Focal Loss:
     ```bash
-    python src/training/train_focal_loss.py --config configs/focal_loss_config.yaml
+    python src/models/focal_loss_network.py --config configs/focal_loss_config.yaml
     ```
 
 - Network with Weighted Cross Entropy:
     ```bash
-    python src/training/train_weighted_ce.py --config configs/weighted_ce_config.yaml
+    python src/models/wce_network.py --config configs/wce_config.yaml
     ```
 
 - Network with Oversampling:
     ```bash
-    python src/training/train_oversampling.py --config configs/oversampling_config.yaml
+    python src/models/oversampling_network.py --config configs/oversampling_config.yaml
     ```
 
 - Network with Synthetic Data:
     ```bash
-    python src/training/train_synthetic.py --config configs/synthetic_data_config.yaml
+    python src/models/synthetic_network.py --config configs/synthetic_data_config.yaml
     ```
 
 ### Evaluation
@@ -149,16 +134,16 @@ Train the desired version of the network:
 Evaluate the trained models using the corresponding evaluation scripts:
 
 ```bash
-python src/evaluation/evaluate_basic.py --config configs/basic_config.yaml
+python src/evaluate_model.py --config configs/basic_config.yaml
 ```
 
-Replace evaluate_basic.py and basic_config.yaml with the appropriate evaluation script and configuration file for other network versions.
+Replace basic_config.yaml with the appropriate configuration file for other network versions.
 
 ## Versions of the Network
 The repository includes the following versions of the network:
 
 Basic Network: The initial simple network architecture.
-Improved Network: Enhanced version with additional layers or optimizations.
+Improved Network: Enhanced version with additional layers and optimizations.
 Network with Focal Loss Function: Incorporates the focal loss to handle class imbalance.
 Network with Weighted Cross Entropy Loss Function: Uses weighted cross entropy to manage class imbalance.
 Network with Oversampling: Applies oversampling techniques to balance the dataset.
