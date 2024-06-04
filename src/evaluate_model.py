@@ -60,8 +60,8 @@ def save_evaluation_results(
     cm_df.to_csv(os.path.join(model_save_path, "confusion_matrix_absolute.csv"))
 
     # Compute and save relative confusion matrix to CSV
-    cm_normalized = (
-        confusion_matrix.astype("float") / confusion_matrix.sum(axis=1)[:, np.newaxis]
+    cm_normalized = confusion_matrix.astype("float") / confusion_matrix.sum(
+        axis=1, keepdims=True
     )
     cm_normalized_df = pd.DataFrame(
         cm_normalized, index=class_labels, columns=class_labels
