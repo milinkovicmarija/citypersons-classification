@@ -1,6 +1,6 @@
 # DNN Classification for CityPersons Dataset
 
-This repository contains the code and resources for my master thesis, which focuses on the classification of persons in traffic using the CityPersons dataset. The work includes developing, improving, and evaluating different versions of a Deep Neural Network (DNN) for this classification task.
+This repository contains the code and resources for my master thesis, which focuses on the classification of persons in traffic using the CityPersons dataset, restricted to three classes: pedestrian, rider and sitting person. The work includes developing, improving, and evaluating different versions of a Deep Neural Network (DNN) for this classification task.
 
 ## Table of Contents
 

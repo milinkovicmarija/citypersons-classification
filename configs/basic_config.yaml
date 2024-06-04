@@ -7,8 +7,8 @@ image_height: 128
 image_width: 128
 
 # Classes
-num_classes: 6
-class_labels: ['ignore', 'pedestrian', 'person group', 'person (other)', 'rider', 'sitting person']
+num_classes: 3
+class_labels: ['pedestrian', 'rider', 'sitting person']
 
 # Training parameters
 num_epochs: 100

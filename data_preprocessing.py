@@ -28,12 +28,12 @@ def process_citypersons_dataset(bbox_path, img_path, output_base_path):
     """Process the CityPersons dataset."""
     # Create output directories if they don't exist
     pedestrian_classes = [
-        "ignore",
+        # "ignore",
         "pedestrian",
         "rider",
         "sitting person",
-        "person (other)",
-        "person group",
+        # "person (other)",
+        # "person group",
     ]
     for cls in pedestrian_classes:
         output_path = os.path.join(output_base_path, cls)
