@@ -1,0 +1,36 @@
+# Focal Loss Model Configuration
+
+model_name: focal_loss_network
+
+# Input image dimensions
+image_height: 128
+image_width: 128
+
+# Classes
+num_classes: 3
+class_labels: ['pedestrian', 'rider', 'sitting person']
+
+# Class counts
+class_counts:
+  - 2303
+  - 993
+  - 352
+
+# Alpha 
+alpha: # normalised inverses of class probabilities [0.1014, 0.2351, 0.6635]
+  - 0.1014
+  - 0.2351
+  - 0.6635
+
+# Training parameters
+num_epochs: 100
+batch_size: 32
+learning_rate: 0.001
+weight_decay: 0.0001
+
+# Dataset paths
+train_dataset_path: data/processed/train
+validation_dataset_path: data/processed/val
+
+# Model save path
+model_save_path: saved_models/focal_loss

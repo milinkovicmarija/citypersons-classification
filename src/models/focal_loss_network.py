@@ -3,7 +3,7 @@ import pickle
 import yaml
 import tensorflow as tf
 from keras import Sequential
-from keras.src.layers import Dense, Dropout
+from keras.src.layers import Dense, Dropout, BatchNormalization
 from keras.src.optimizers import Adam
 from keras.src.applications.resnet import ResNet50
 from keras.src.metrics import FalsePositives, AUC
@@ -11,6 +11,7 @@ from keras.src.regularizers import L2
 from keras.src.layers import RandomFlip, RandomRotation, RandomZoom
 from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
+from keras.src.losses import CategoricalFocalCrossentropy
 
 
 def create_model(height, width, num_classes):
@@ -38,8 +39,13 @@ def create_model(height, width, num_classes):
 
 def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
-        [RandomFlip("horizontal"), RandomRotation(0.2), RandomZoom(0.2)]
+        [
+            RandomFlip("horizontal"),
+            RandomRotation(0.2),
+            RandomZoom(0.2),
+        ]
     )
+
     return data_augmentation
 
 
@@ -63,11 +69,16 @@ def train_model(train_set, validation_set, config):
 
     dnn_model.compile(
         optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
-        loss="categorical_crossentropy",
+        loss=CategoricalFocalCrossentropy(gamma=2.0),
         metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
     )
 
     dnn_model.summary()
+
+    data_augmentation = create_data_augmentation_pipeline()
+    train_set = train_set.map(
+        lambda x, y: (data_augmentation(x, training=True), y)
+    )  # Apply data augmentation
 
     # Early stopping callback
     early_stopping = EarlyStopping(
@@ -81,11 +92,6 @@ def train_model(train_set, validation_set, config):
     reduce_lr = ReduceLROnPlateau(
         monitor="val_loss", factor=0.1, patience=5, min_lr=1e-6, verbose=1
     )
-
-    data_augmentation = create_data_augmentation_pipeline()
-    train_set = train_set.map(
-        lambda x, y: (data_augmentation(x, training=True), y)
-    )  # Apply data augmentation
 
     history = dnn_model.fit(
         train_set,
@@ -105,7 +111,7 @@ def train_model(train_set, validation_set, config):
 
 
 if __name__ == "__main__":
-    config_file = "configs/improved_config.yaml"
+    config_file = "configs/focal_loss_config.yaml"
     config = load_config(config_file)
 
     train_set = image_dataset_from_directory(

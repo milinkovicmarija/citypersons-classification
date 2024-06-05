@@ -1,6 +1,6 @@
-# Oversampling Model Configuration
+# Weighted Cross Entropy Model Configuration
 
-model_name: oversampling_network
+model_name: wce_network
 
 # Input image dimensions
 image_height: 128
@@ -10,20 +10,11 @@ image_width: 128
 num_classes: 3
 class_labels: ['pedestrian', 'rider', 'sitting person']
 
-# Class counts
-class_counts:
-  0: 2303
-  1: 993
-  2: 352
-
-dataset_size:
-  3648
-
-# Oversampling factors
-resampling_factors:
-  0: 1 # 2303 / 2303 = 1 
-  1: 3 # 2303 / 993 = 2.32 = 2
-  2: 7 # 2303 / 352 = 6.54 = 7
+# Class weights for weighted cross-entropy
+class_weights: # inverses of class probabilities [1.584, 3.673, 10.362]
+  0: 1.584
+  1: 3.673
+  2: 10.362
 
 # Training parameters
 num_epochs: 100
@@ -36,4 +27,4 @@ train_dataset_path: data/processed/train
 validation_dataset_path: data/processed/val
 
 # Model save path
-model_save_path: saved_models/oversampling
+model_save_path: saved_models/wce

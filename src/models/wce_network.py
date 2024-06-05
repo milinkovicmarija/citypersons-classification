@@ -11,6 +11,7 @@ from keras.src.regularizers import L2
 from keras.src.layers import RandomFlip, RandomRotation, RandomZoom
 from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
+from keras.src.losses import CategoricalCrossentropy
 
 
 def create_model(height, width, num_classes):
@@ -40,6 +41,7 @@ def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
         [RandomFlip("horizontal"), RandomRotation(0.2), RandomZoom(0.2)]
     )
+
     return data_augmentation
 
 
@@ -58,12 +60,13 @@ def train_model(train_set, validation_set, config):
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
     model_save_path = config["model_save_path"]
+    class_weights = config["class_weights"]
 
     dnn_model = create_model(height, width, num_classes)
 
     dnn_model.compile(
         optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
-        loss="categorical_crossentropy",
+        loss=CategoricalCrossentropy(),
         metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
     )
 
@@ -93,6 +96,7 @@ def train_model(train_set, validation_set, config):
         epochs=num_epochs,
         batch_size=batch_size,
         callbacks=[early_stopping, reduce_lr],
+        class_weight=class_weights,
     )
 
     # Save the model
@@ -105,7 +109,7 @@ def train_model(train_set, validation_set, config):
 
 
 if __name__ == "__main__":
-    config_file = "configs/improved_config.yaml"
+    config_file = "configs/wce_config.yaml"
     config = load_config(config_file)
 
     train_set = image_dataset_from_directory(
