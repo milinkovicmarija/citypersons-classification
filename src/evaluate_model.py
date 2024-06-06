@@ -24,11 +24,14 @@ def evaluate_model(validation_set, model_save_path, class_labels):
     def extract_labels(images, labels):
         return np.argmax(labels.numpy(), axis=1)
 
-    # Extract true labels from the validation set
+    # Extract true labels and images from the validation set
     y_true = []
+    validation_images = []
     for images, labels in validation_set:
         y_true.extend(extract_labels(images, labels))
+        validation_images.extend(images.numpy())
     y_true = np.array(y_true)
+    validation_images = np.array(validation_images)
 
     # Generate predictions
     y_pred = np.argmax(model.predict(validation_set), axis=-1)
@@ -47,6 +50,11 @@ def evaluate_model(validation_set, model_save_path, class_labels):
 
     # Visualize and save model architecture
     plot_model_architecture(model, model_save_path)
+
+    # Show and save incorrectly classified images
+    show_incorrectly_classified_images(
+        validation_images, y_true, y_pred, class_labels, model_save_path
+    )
 
 
 def save_evaluation_results(
@@ -140,6 +148,26 @@ def plot_model_architecture(model, model_save_path):
         show_shapes=True,
         show_layer_names=True,
     )
+
+
+def show_incorrectly_classified_images(
+    images, y_true, y_pred, class_labels, model_save_path
+):
+    incorrect_indices = np.where(y_true != y_pred)[0]
+    os.makedirs(os.path.join(model_save_path, "incorrectly_classified"), exist_ok=True)
+
+    for idx in incorrect_indices:
+        image = images[idx]
+        true_label = class_labels[y_true[idx]]
+        pred_label = class_labels[y_pred[idx]]
+
+        plt.imshow(image.astype("uint8"))
+        plt.title(f"True: {true_label}, Pred: {pred_label}")
+        plt.axis("off")
+        plt.savefig(
+            os.path.join(model_save_path, "incorrectly_classified", f"{idx}.png")
+        )
+        plt.clf()
 
 
 if __name__ == "__main__":

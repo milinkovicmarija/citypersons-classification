@@ -3,15 +3,21 @@ import pickle
 import yaml
 import tensorflow as tf
 from keras import Sequential
-from keras.src.layers import Dense, Dropout
+from keras.src.layers import (
+    Dense,
+    Dropout,
+    RandomFlip,
+    RandomRotation,
+    RandomZoom,
+    RandomBrightness,
+    RandomContrast,
+)
 from keras.src.optimizers import Adam
 from keras.src.applications.resnet import ResNet50
 from keras.src.metrics import FalsePositives, AUC
 from keras.src.regularizers import L2
-from keras.src.layers import RandomFlip, RandomRotation, RandomZoom
 from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
-from keras.src.losses import CategoricalCrossentropy
 
 
 def create_model(height, width, num_classes):
@@ -22,7 +28,7 @@ def create_model(height, width, num_classes):
         weights="imagenet",
     )
 
-    for layer in imported_model.layers[:-26]:
+    for layer in imported_model.layers[:-40]:
         layer.trainable = False
 
     dnn_model = Sequential(
@@ -39,9 +45,14 @@ def create_model(height, width, num_classes):
 
 def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
-        [RandomFlip("horizontal"), RandomRotation(0.2), RandomZoom(0.2)]
+        [
+            RandomFlip("horizontal"),
+            RandomRotation(0.2),
+            RandomZoom(0.2),
+            RandomBrightness(0.2),
+            RandomContrast(0.2),
+        ]
     )
-
     return data_augmentation
 
 
@@ -66,7 +77,7 @@ def train_model(train_set, validation_set, config):
 
     dnn_model.compile(
         optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
-        loss=CategoricalCrossentropy(),
+        loss="categorical_crossentropy",
         metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
     )
 
@@ -75,14 +86,14 @@ def train_model(train_set, validation_set, config):
     # Early stopping callback
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=10,  # Number of epochs with no improvement after which training will be stopped
+        patience=5,  # Number of epochs with no improvement after which training will be stopped
         restore_best_weights=True,
         start_from_epoch=20,
     )
 
     # Learning Rate Schedulers
     reduce_lr = ReduceLROnPlateau(
-        monitor="val_loss", factor=0.1, patience=5, min_lr=1e-6, verbose=1
+        monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1
     )
 
     data_augmentation = create_data_augmentation_pipeline()

@@ -3,12 +3,19 @@ import pickle
 import yaml
 import tensorflow as tf
 from keras import Sequential
-from keras.src.layers import Dense, Dropout, BatchNormalization
+from keras.src.layers import (
+    Dense,
+    Dropout,
+    RandomFlip,
+    RandomRotation,
+    RandomZoom,
+    RandomBrightness,
+    RandomContrast,
+)
 from keras.src.optimizers import Adam
 from keras.src.applications.resnet import ResNet50
 from keras.src.metrics import FalsePositives, AUC
 from keras.src.regularizers import L2
-from keras.src.layers import RandomFlip, RandomRotation, RandomZoom
 from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
 from keras.src.losses import CategoricalFocalCrossentropy
@@ -37,15 +44,17 @@ def create_model(height, width, num_classes):
     return dnn_model
 
 
+
 def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
         [
             RandomFlip("horizontal"),
             RandomRotation(0.2),
             RandomZoom(0.2),
+            RandomBrightness(0.2),
+            RandomContrast(0.2),
         ]
     )
-
     return data_augmentation
 
 
@@ -64,12 +73,13 @@ def train_model(train_set, validation_set, config):
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
     model_save_path = config["model_save_path"]
+    alpha = config["alpha"]
 
     dnn_model = create_model(height, width, num_classes)
 
     dnn_model.compile(
         optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
-        loss=CategoricalFocalCrossentropy(gamma=2.0),
+        loss=CategoricalFocalCrossentropy(gamma=2.0, alpha=alpha),
         metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
     )
 

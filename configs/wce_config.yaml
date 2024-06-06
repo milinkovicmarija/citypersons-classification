@@ -19,7 +19,7 @@ class_weights: # inverses of class probabilities [1.584, 3.673, 10.362]
 # Training parameters
 num_epochs: 100
 batch_size: 32
-learning_rate: 0.001
+learning_rate: 0.0001
 weight_decay: 0.0001
 
 # Dataset paths
