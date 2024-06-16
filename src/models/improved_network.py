@@ -29,13 +29,13 @@ def create_model(height, width, num_classes):
     )
 
     for layer in imported_model.layers[:-40]:
-        layer.trainable = False
+        layer.trainable = True
 
     dnn_model = Sequential(
         [
             imported_model,
             Dense(512, activation="relu", kernel_regularizer=L2(0.01)),
-            Dropout(0.5),
+            Dropout(0.2),
             Dense(num_classes, activation="softmax", kernel_regularizer=L2(0.01)),
         ]
     )
@@ -47,10 +47,10 @@ def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
         [
             RandomFlip("horizontal"),
-            RandomRotation(0.2),
-            RandomZoom(0.2),
-            RandomBrightness(0.2),
-            RandomContrast(0.2),
+            RandomRotation(0.1),
+            RandomZoom(0.1),
+            RandomBrightness(0.1),
+            RandomContrast(0.1),
         ]
     )
     return data_augmentation
@@ -85,7 +85,7 @@ def train_model(train_set, validation_set, config):
     # Early stopping callback
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=5,  # Number of epochs with no improvement after which training will be stopped
+        patience=10,
         restore_best_weights=True,
         start_from_epoch=20,
     )
