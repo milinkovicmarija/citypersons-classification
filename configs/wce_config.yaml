@@ -11,10 +11,10 @@ num_classes: 3
 class_labels: ['pedestrian', 'rider', 'sitting person']
 
 # Class weights for weighted cross-entropy
-class_weights: # inverses of class probabilities [1.584, 3.673, 10.362]
-  0: 1.584
-  1: 3.673
-  2: 10.362
+class_weights: # normalised inverses of class probabilities
+  0: 0.1014
+  1: 0.2351
+  2: 0.6635
 
 # Training parameters
 num_epochs: 100
