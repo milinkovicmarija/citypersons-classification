@@ -19,40 +19,17 @@ from keras.src.regularizers import L2
 from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
 from keras.src.losses import CategoricalFocalCrossentropy
-
-
-def create_model(height, width, num_classes):
-    imported_model = ResNet50(
-        include_top=False,
-        input_shape=(height, width, 3),
-        pooling="avg",
-        weights="imagenet",
-    )
-
-    for layer in imported_model.layers[:-26]:
-        layer.trainable = False
-
-    dnn_model = Sequential(
-        [
-            imported_model,
-            Dense(512, activation="relu", kernel_regularizer=L2(0.01)),
-            Dropout(0.5),
-            Dense(num_classes, activation="softmax", kernel_regularizer=L2(0.01)),
-        ]
-    )
-
-    return dnn_model
-
+import keras_tuner as kt
 
 
 def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
         [
             RandomFlip("horizontal"),
-            RandomRotation(0.2),
-            RandomZoom(0.2),
-            RandomBrightness(0.2),
-            RandomContrast(0.2),
+            RandomRotation(0.1),
+            RandomZoom(0.1),
+            RandomBrightness(0.1),
+            RandomContrast(0.1),
         ]
     )
     return data_augmentation
@@ -75,34 +52,73 @@ def train_model(train_set, validation_set, config):
     model_save_path = config["model_save_path"]
     alpha = config["alpha"]
 
-    dnn_model = create_model(height, width, num_classes)
-
-    dnn_model.compile(
-        optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
-        loss=CategoricalFocalCrossentropy(gamma=2.0, alpha=alpha),
-        metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
-    )
-
-    dnn_model.summary()
-
     data_augmentation = create_data_augmentation_pipeline()
     train_set = train_set.map(
         lambda x, y: (data_augmentation(x, training=True), y)
     )  # Apply data augmentation
 
-    # Early stopping callback
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=10,  # Number of epochs with no improvement after which training will be stopped
+        patience=10,
         restore_best_weights=True,
         start_from_epoch=20,
     )
 
-    # Learning Rate Schedulers
     reduce_lr = ReduceLROnPlateau(
-        monitor="val_loss", factor=0.1, patience=5, min_lr=1e-6, verbose=1
+        monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1
     )
 
+    def model_builder(hp):
+        gamma = hp.Choice("gamma", values=[0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
+
+        imported_model = ResNet50(
+            include_top=False,
+            input_shape=(height, width, 3),
+            pooling="avg",
+            weights="imagenet",
+        )
+
+        for layer in imported_model.layers[:-40]:
+            layer.trainable = True
+
+        dnn_model = Sequential(
+            [
+                imported_model,
+                Dense(512, activation="relu", kernel_regularizer=L2(0.01)),
+                Dropout(0.2),
+                Dense(num_classes, activation="softmax", kernel_regularizer=L2(0.01)),
+            ]
+        )
+
+        dnn_model.compile(
+            optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
+            loss=CategoricalFocalCrossentropy(gamma=gamma, alpha=alpha),
+            metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
+        )
+
+        return dnn_model
+
+    tuner = kt.RandomSearch(
+        model_builder,
+        objective="val_loss",
+        max_trials=20,
+        executions_per_trial=1,
+        directory="ktuner",
+        project_name="focal_loss_gamma_search",
+    )
+
+    tuner.search(
+        train_set,
+        validation_data=validation_set,
+        epochs=10,
+        batch_size=batch_size,
+        callbacks=[early_stopping, reduce_lr],
+    )
+
+    best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+    print(f"Best gamma: {best_hps.get('gamma')}")
+
+    dnn_model = tuner.hypermodel.build(best_hps)
     history = dnn_model.fit(
         train_set,
         validation_data=validation_set,
@@ -111,7 +127,6 @@ def train_model(train_set, validation_set, config):
         callbacks=[early_stopping, reduce_lr],
     )
 
-    # Save the model
     os.makedirs(model_save_path, exist_ok=True)
     dnn_model.save(filepath=os.path.join(model_save_path, "model.keras"))
     with open(os.path.join(model_save_path, "history.pkl"), "wb") as f:
