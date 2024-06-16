@@ -34,7 +34,7 @@ def evaluate_model(validation_set, model_save_path, class_labels):
     validation_images = np.array(validation_images)
 
     # Generate predictions
-    y_pred = np.argmax(model.predict(validation_set), axis=-1)
+    y_pred = np.argmax(model.predict(validation_images), axis=-1)
 
     # Compute evaluation metrics
     cm = confusion_matrix(y_true, y_pred)
