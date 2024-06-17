@@ -1,6 +1,7 @@
 import os
 import pickle
 import yaml
+import numpy as np
 import tensorflow as tf
 from keras import Sequential
 from keras.src.layers import (
@@ -20,6 +21,7 @@ from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.src.utils import image_dataset_from_directory
 from sklearn.utils import resample, shuffle
 import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
 
 
 def oversample_dataset(dataset, class_counts):
@@ -90,39 +92,45 @@ def create_model(height, width, num_classes):
     )
 
     for layer in imported_model.layers[:-40]:
-        layer.trainable = False
+        layer.trainable = True
 
     dnn_model = Sequential(
         [
             imported_model,
             Dense(512, activation="relu", kernel_regularizer=L2(0.01)),
-            Dropout(0.5),
+            Dropout(0.2),
             Dense(num_classes, activation="softmax", kernel_regularizer=L2(0.01)),
         ]
     )
 
     return dnn_model
 
-
 def create_data_augmentation_pipeline():
     data_augmentation = Sequential(
         [
             RandomFlip("horizontal"),
-            RandomRotation(0.2),
-            RandomZoom(0.2),
-            RandomBrightness(0.2),
-            RandomContrast(0.2),
+            RandomRotation(0.1),
+            RandomZoom(0.1),
+            RandomBrightness(0.1),
+            RandomContrast(0.1),
         ]
     )
-
     return data_augmentation
-
 
 def load_config(config_file):
     with open(config_file, "r") as f:
         config = yaml.safe_load(f)
     return config
 
+def get_class_weights(train_set, class_labels):
+    # Initialize an array to hold the count of each class
+    class_counts = np.zeros(len(class_labels))
+    for _, labels in train_set:
+        class_counts += np.sum(labels.numpy(), axis=0)
+    # Compute class weights
+    class_weights = compute_class_weight('balanced', classes=np.arange(len(class_labels)), y=np.argmax(labels, axis=-1))
+    class_weights_dict = {i: weight for i, weight in enumerate(class_weights)}
+    return class_weights_dict
 
 def train_model(train_set, validation_set, config):
     height = config["image_height"]
@@ -133,7 +141,7 @@ def train_model(train_set, validation_set, config):
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
     model_save_path = config["model_save_path"]
-    class_counts = config["class_counts"]
+    class_labels = config["class_labels"]
 
     dnn_model = create_model(height, width, num_classes)
 
@@ -148,7 +156,7 @@ def train_model(train_set, validation_set, config):
     # Early stopping callback
     early_stopping = EarlyStopping(
         monitor="val_loss",
-        patience=5,  # Number of epochs with no improvement after which training will be stopped
+        patience=10,
         restore_best_weights=True,
         start_from_epoch=20,
     )
@@ -158,18 +166,19 @@ def train_model(train_set, validation_set, config):
         monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6, verbose=1
     )
 
-    oversampled_train_set = oversample_dataset(train_set, class_counts)
-
     data_augmentation = create_data_augmentation_pipeline()
-    augmented_train_set = oversampled_train_set.map(
+    train_set = train_set.map(
         lambda x, y: (data_augmentation(x, training=True), y)
     )  # Apply data augmentation
 
+    class_weights = get_class_weights(train_set, class_labels)
+
     history = dnn_model.fit(
-        augmented_train_set,
+        train_set,
         validation_data=validation_set,
         epochs=num_epochs,
         batch_size=batch_size,
+        class_weight=class_weights,
         callbacks=[early_stopping, reduce_lr],
     )
 
@@ -181,9 +190,8 @@ def train_model(train_set, validation_set, config):
 
     return history
 
-
 if __name__ == "__main__":
-    config_file = "configs/oversampling_config.yaml"
+    config_file = "configs/improved_config.yaml"
     config = load_config(config_file)
 
     train_set = image_dataset_from_directory(

@@ -28,12 +28,13 @@ resampling_factors:
 # Training parameters
 num_epochs: 100
 batch_size: 32
-learning_rate: 0.001
+learning_rate: 0.0001
 weight_decay: 0.0001
 
 # Dataset paths
 train_dataset_path: data/processed/train
 validation_dataset_path: data/processed/val
+augmentation_save_dir: data/augmented
 
 # Model save path
 model_save_path: saved_models/oversampling
