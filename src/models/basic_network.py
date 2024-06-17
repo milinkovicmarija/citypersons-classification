@@ -18,7 +18,7 @@ def create_model(height, width, num_classes):
         weights="imagenet",
     )
 
-    for layer in imported_model.layers[:-26]:
+    for layer in imported_model.layers:
         layer.trainable = False
 
     dnn_model = Sequential()
