@@ -124,11 +124,6 @@ Train the desired version of the network:
     python src/models/oversampling_network.py --config configs/oversampling_config.yaml
     ```
 
-- Network with Synthetic Data:
-    ```bash
-    python src/models/synthetic_network.py --config configs/synthetic_data_config.yaml
-    ```
-
 ### Evaluation
 
 Evaluate the trained models using the corresponding evaluation scripts:
@@ -142,12 +137,11 @@ Replace basic_config.yaml with the appropriate configuration file for other netw
 ## Versions of the Network
 The repository includes the following versions of the network:
 
-Basic Network: The initial simple network architecture.
-Improved Network: Enhanced version with additional layers and optimizations.
-Network with Focal Loss Function: Incorporates the focal loss to handle class imbalance.
-Network with Weighted Cross Entropy Loss Function: Uses weighted cross entropy to manage class imbalance.
-Network with Oversampling: Applies oversampling techniques to balance the dataset.
-Network with Synthetic Data: Utilizes synthetic data to augment the training set.
+Basic Network: The initial simple network architecture. \
+Improved Network: Enhanced version with additional layers and optimizations. \
+Network with Focal Loss Function: Incorporates the focal loss to handle class imbalance. \
+Network with Weighted Cross Entropy Loss Function: Uses weighted cross entropy to manage class imbalance. \
+Network with Oversampling: Applies oversampling techniques to balance the dataset. \
 
 ## Dataset
 The CityPersons dataset is used for this project. Make sure to download the dataset as outlined in the Usage section.
