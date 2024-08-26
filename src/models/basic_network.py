@@ -6,7 +6,7 @@ from keras import Sequential
 from keras.src.layers import Dense
 from keras.src.optimizers import Adam
 from keras.src.applications.resnet import ResNet50
-from keras.src.metrics import FalsePositives, AUC
+from keras.src.metrics import FalsePositives
 from keras.src.utils import image_dataset_from_directory
 
 
@@ -50,7 +50,7 @@ def train_model(train_set, validation_set, config):
     dnn_model.compile(
         optimizer=Adam(learning_rate=learning_rate, weight_decay=weight_decay),
         loss="categorical_crossentropy",
-        metrics=["accuracy", FalsePositives(), AUC(from_logits=False)],
+        metrics=["accuracy", FalsePositives()],
     )
 
     dnn_model.summary()
